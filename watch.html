@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyTube - 播放页</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: #fff;
+    }
+
+    header {
+      background: #181818;
+      padding: 16px 24px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    header a {
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 14px;
+      background: black;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 22px;
+    }
+
+    .desc {
+      margin-top: 15px;
+      background: #181818;
+      padding: 15px;
+      border-radius: 12px;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .recommend {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .recommend-item {
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .recommend-item:hover {
+      transform: scale(1.03);
+    }
+
+    .recommend-item img {
+      width: 140px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .recommend-title {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    #tcomment {
+      margin-top: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html">← MyTube</a>
+</header>
+
+<div class="layout">
+
+  <!-- 左侧主内容 -->
+  <div>
+    <video id="player" controls autoplay></video>
+    <h1 id="title"></h1>
+    <div class="desc" id="desc"></div>
+
+    <!-- 评论区 -->
+    <div id="tcomment"></div>
+  </div>
+
+  <!-- 右侧推荐 -->
+  <div class="recommend" id="recommend"></div>
+
+</div>
+
+<script>
+  // 视频数据
+  const videos = [
+    {
+      title: "示例视频 1",
+      file: "video1.mp4",
+      cover: "cover/cover1.jpg",
+      desc: "这是示例视频1的简介内容。"
+    },
+    {
+      title: "示例视频 2",
+      file: "video2.mp4",
+      cover: "cover/cover2.jpg",
+      desc: "这是示例视频2的简介内容。"
+    }
+  ];
+
+  const params = new URLSearchParams(window.location.search);
+  const videoFile = params.get("video");
+
+  const player = document.getElementById("player");
+  const title = document.getElementById("title");
+  const desc = document.getElementById("desc");
+  const recommend = document.getElementById("recommend");
+
+  let current = videos.find(v => v.file === videoFile) || videos[0];
+
+  player.src = "video/" + current.file;
+  title.textContent = current.title;
+  desc.textContent = current.desc;
+
+  // 推荐视频
+  videos.forEach(v => {
+    if (v.file !== current.file) {
+      const item = document.createElement("div");
+      item.className = "recommend-item";
+      item.innerHTML = `
+        <img src="${v.cover}">
+        <div class="recommend-title">${v.title}</div>
+      `;
+      item.onclick = () => {
+        window.location.href = `watch.html?video=${v.file}`;
+      };
+      recommend.appendChild(item);
+    }
+  });
+</script>
+
+<!-- Twikoo 评论 -->
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.min.js"></script>
+<script>
+twikoo.init({
+  envId: '您的环境id',
+  el: '#tcomment',
+  path: location.pathname + location.search
+})
+</script>
+
+</body>
+</html>
