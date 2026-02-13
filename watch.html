@@ -1,33 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyTube - 播放页</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>播放页</title>
+
+  <!-- 不蒜子统计 -->
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
     body {
+      margin: 0;
       background: #0f0f0f;
-      color: #fff;
+      color: white;
+      font-family: sans-serif;
     }
 
     header {
       background: #181818;
-      padding: 16px 24px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    header a {
-      text-decoration: none;
-      color: #fff;
+      padding: 18px 24px;
     }
 
     .layout {
@@ -41,7 +32,7 @@
 
     video {
       width: 100%;
-      border-radius: 14px;
+      border-radius: 12px;
       background: black;
     }
 
@@ -59,6 +50,12 @@
       line-height: 1.6;
     }
 
+    .stats {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
     .recommend {
       display: flex;
       flex-direction: column;
@@ -67,7 +64,7 @@
 
     .recommend-item {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
       transition: 0.2s;
     }
@@ -77,15 +74,10 @@
     }
 
     .recommend-item img {
-      width: 140px;
-      height: 80px;
+      width: 120px;
+      height: 70px;
       object-fit: cover;
       border-radius: 8px;
-    }
-
-    .recommend-title {
-      font-size: 14px;
-      color: #ccc;
     }
 
     #tcomment {
@@ -103,18 +95,25 @@
 <body>
 
 <header>
-  <a href="index.html">← MyTube</a>
+  <a href="index.html" style="color:white;text-decoration:none;">← MyTube</a>
 </header>
 
 <div class="layout">
 
-  <!-- 左侧主内容 -->
+  <!-- 左侧 -->
   <div>
     <video id="player" controls autoplay></video>
     <h1 id="title"></h1>
+
+    <!-- 统计 -->
+    <div class="stats">
+      👁 本视频播放量：
+      <span id="busuanzi_value_page_pv"></span>
+    </div>
+
     <div class="desc" id="desc"></div>
 
-    <!-- 评论区 -->
+    <!-- 评论 -->
     <div id="tcomment"></div>
   </div>
 
@@ -123,48 +122,34 @@
 
 </div>
 
-<script>
-  // 视频数据
-  const videos = [
-    {
-      title: "丹尼尔版晴天",
-      file: "video1.mp4",
-      cover: "cover/cover1.jpg",
-      desc: "你猜他为什么叫晴天？因为周杰伦都无雨了。 #鬼畜 #雷霆 #低音炮”"
-    },
-    {
-      title: "示例视频 2",
-      file: "video2.mp4",
-      cover: "cover/cover2.jpg",
-      desc: "这是示例视频2的简介内容。"
-    }
-  ];
+<script src="videos.js"></script>
 
-  const params = new URLSearchParams(window.location.search);
-  const videoFile = params.get("video");
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
   const player = document.getElementById("player");
   const title = document.getElementById("title");
   const desc = document.getElementById("desc");
   const recommend = document.getElementById("recommend");
 
-  let current = videos.find(v => v.file === videoFile) || videos[0];
+  const current = videos.find(v => v.id === id) || videos[0];
 
   player.src = "video/" + current.file;
   title.textContent = current.title;
   desc.textContent = current.desc;
 
   // 推荐视频
-  videos.forEach(v => {
-    if (v.file !== current.file) {
+  videos.forEach(video => {
+    if (video.id !== current.id) {
       const item = document.createElement("div");
       item.className = "recommend-item";
       item.innerHTML = `
-        <img src="${v.cover}">
-        <div class="recommend-title">${v.title}</div>
+        <img src="${video.cover}">
+        <div>${video.title}</div>
       `;
       item.onclick = () => {
-        window.location.href = `watch.html?video=${v.file}`;
+        window.location.href = `watch.html?id=${video.id}`;
       };
       recommend.appendChild(item);
     }
@@ -175,7 +160,7 @@
 <script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.min.js"></script>
 <script>
 twikoo.init({
-  envId: '您的环境id',
+  envId: '你的环境ID',
   el: '#tcomment',
   path: location.pathname + location.search
 })
